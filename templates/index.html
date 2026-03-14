@@ -128,7 +128,7 @@
                 <div class="card">
                     <h2 class="card-title">Upload Resume</h2>
 
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" id="resume-form" enctype="multipart/form-data"> 
                         <div class="upload-area" id="drop-zone">
                             <div class="upload-icons">
                                 <i class="far fa-file-pdf"></i> + <i class="far fa-file-word"></i>
@@ -138,7 +138,7 @@
                             </p>
 
                             <input type="file" name="pdf_file" id="file-input" accept=".pdf,.doc,.docx"
-                                style="display: none;">
+                                style="display: none;"> 
 
                             <button type="button" class="btn-primary" id="upload-btn"
                                 style="margin-bottom: 10px;">Select File</button>
@@ -233,7 +233,7 @@
                         <li>Microphone</li>
                     </ul>
 
-                    <a href="exam.html" style="text-decoration: none;">
+                    <a href="/exam" id="start-exam-link" style="text-decoration: none; display: none;">
                         <button type="button" class="btn-start-exam">
                             <i class="fas fa-play"></i> START EXAM
                         </button>

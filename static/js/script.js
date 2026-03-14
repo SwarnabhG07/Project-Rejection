@@ -196,3 +196,53 @@ function handleCompanyFile(file) {
     if (companyUploadBtn) companyUploadBtn.style.display = 'none';
     if (companySubmitBtn) companySubmitBtn.style.display = 'block';
 }
+
+const resumeForm = document.getElementById('resume-form');
+const startExamLink = document.getElementById('start-exam-link');
+
+if (resumeForm) {
+    resumeForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Stop the page from reloading
+        
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.value = "Processing...";
+        submitBtn.disabled = true;
+
+        const formData = new FormData(resumeForm);
+
+        try {
+            const response = await fetch('/resume-upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Catch the custom missing skills error from Python
+            if (!response.ok) {
+                alert(data.error || "An error occurred.");
+                submitBtn.value = "Submit to Server";
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Check the RAG Engine result
+            if (data.is_match === "yes" || data.is_match === true) {
+                alert("Match found! The exam is now unlocked.");
+                startExamLink.style.display = 'block'; // Unhide the button!
+                submitBtn.value = "Uploaded Successfully";
+                submitBtn.style.backgroundColor = "#6c757d"; // Turn gray to show it's done
+            } else {
+                alert("Candidate profile does not match required skills. Exam remains locked.");
+                submitBtn.value = "Submit to Server";
+                submitBtn.disabled = false;
+            }
+
+        } catch (error) {
+            console.error("Upload error:", error);
+            alert("Failed to connect to the server.");
+            submitBtn.value = "Submit to Server";
+            submitBtn.disabled = false;
+        }
+    });
+}
