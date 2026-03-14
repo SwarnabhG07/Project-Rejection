@@ -80,49 +80,7 @@ function handleFile(file) {
 }
 
 // ==========================================
-// 2. WEBCAM INITIALIZATION LOGIC
-// ==========================================
-const startExamBtn = document.getElementById('start-exam-btn');
-const videoContainer = document.getElementById('video-container');
-const webcamFeed = document.getElementById('webcam-feed');
-
-if (startExamBtn) {
-    startExamBtn.addEventListener('click', async () => {
-        try {
-            // 1. Request access to the user's camera
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
-            // 2. Reveal the video container in the UI
-            if (videoContainer) videoContainer.style.display = 'block';
-
-            // 3. Attach the camera stream to the video element
-            if (webcamFeed) {
-                webcamFeed.srcObject = stream;
-
-                // 4. Trigger Native Fullscreen on the video element
-                if (webcamFeed.requestFullscreen) {
-                    await webcamFeed.requestFullscreen();
-                } else if (webcamFeed.webkitRequestFullscreen) { /* Safari support */
-                    await webcamFeed.webkitRequestFullscreen();
-                } else if (webcamFeed.msRequestFullscreen) { /* IE11 support */
-                    await webcamFeed.msRequestFullscreen();
-                }
-            }
-
-            // 5. Update the button to indicate the exam has started
-            startExamBtn.innerHTML = '<i class="fas fa-video"></i> EXAM IN PROGRESS';
-            startExamBtn.style.backgroundColor = '#198754';
-            startExamBtn.style.cursor = 'default';
-            startExamBtn.disabled = true;
-
-        } catch (error) {
-            console.error('Error accessing the webcam or fullscreen: ', error);
-            alert('Could not start the exam. Please ensure you have granted camera permissions.');
-        }
-    });
-}
-// ==========================================
-// 3. SKILLS LOGIC
+// 2. SKILLS LOGIC
 // ==========================================
 const skillInput = document.getElementById('skill-input');
 const addSkillBtn = document.getElementById('add-skill-btn');
@@ -159,6 +117,9 @@ if (skillsContainer) {
     });
 }
 
-document.getElementById('skills-form').addEventListener('submit', function() {
-    hiddenSkillsInput.value = JSON.stringify(skills);
-});
+const skillsForm = document.getElementById('skills-form');
+if (skillsForm) {
+    skillsForm.addEventListener('submit', function() {
+        hiddenSkillsInput.value = JSON.stringify(skills);
+    });
+}
