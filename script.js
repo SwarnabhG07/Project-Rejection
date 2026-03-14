@@ -1,55 +1,64 @@
-
+// ==========================================
+// 1. RESUME UPLOAD LOGIC
+// ==========================================
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadBtn = document.getElementById('upload-btn');
 const fileDisplay = document.getElementById('file-display');
+const submitBtn = document.getElementById('submit-btn');
 
-// 1. Trigger hidden file input when clicking the button or the drop zone
-uploadBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevents double-firing if clicking the button inside the drop zone
-    fileInput.click();
-});
+// Trigger hidden file input when clicking the button or the drop zone
+if (uploadBtn) {
+    uploadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+}
 
-dropZone.addEventListener('click', () => {
-    fileInput.click();
-});
+if (dropZone) {
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
 
-// 2. Handle Drag and Drop Visuals
-dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('dragover');
-});
+    // Handle Drag and Drop Visuals
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
 
-dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('dragover');
-});
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
 
-// 3. Handle File Drop
-dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
+    // Handle File Drop
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files; // Assign dropped file to the hidden input
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+}
 
-    if (e.dataTransfer.files.length > 0) {
-        handleFile(e.dataTransfer.files[0]);
-    }
-});
+// Handle File Browse Selection
+if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+}
 
-// 4. Handle File Browse Selection
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleFile(e.target.files[0]);
-    }
-});
-
-// 5. Validate and Process the File
+// Validate and Process the File
 function handleFile(file) {
-    // Allow PDFs and Word Docs
     const validTypes = [
-        'application/pdf',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/pdf', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
         'application/msword'
     ];
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const maxSize = 5 * 1024 * 1024; // 5MB
 
     if (!validTypes.includes(file.type)) {
         alert('Invalid file type! Please upload a PDF or DOCX file.');
@@ -61,11 +70,54 @@ function handleFile(file) {
         return;
     }
 
-    // Update the UI to show success
-    fileDisplay.innerHTML = `<i class="fas fa-check-circle"></i> Successfully attached: ${file.name}`;
+    // Show the success message
+    fileDisplay.innerHTML = `<i class="fas fa-check-circle"></i> Ready to upload: ${file.name}`;
     fileDisplay.style.display = 'block';
-    uploadBtn.textContent = 'Change Resume';
+    
+    // Hide the original browse button and show the submit button
+    if (uploadBtn) uploadBtn.style.display = 'none';
+    if (submitBtn) submitBtn.style.display = 'block';
+}
 
-    // Note: In a real app, you would use FormData and fetch() here to send 'file' to your server.
-    console.log("Ready to send to server:", file.name);
+// ==========================================
+// 2. WEBCAM INITIALIZATION LOGIC
+// ==========================================
+const startExamBtn = document.getElementById('start-exam-btn');
+const videoContainer = document.getElementById('video-container');
+const webcamFeed = document.getElementById('webcam-feed');
+
+if (startExamBtn) {
+    startExamBtn.addEventListener('click', async () => {
+        try {
+            // 1. Request access to the user's camera
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            
+            // 2. Reveal the video container in the UI
+            if (videoContainer) videoContainer.style.display = 'block';
+            
+            // 3. Attach the camera stream to the video element
+            if (webcamFeed) {
+                webcamFeed.srcObject = stream;
+                
+                // 4. Trigger Native Fullscreen on the video element
+                if (webcamFeed.requestFullscreen) {
+                    await webcamFeed.requestFullscreen();
+                } else if (webcamFeed.webkitRequestFullscreen) { /* Safari support */
+                    await webcamFeed.webkitRequestFullscreen();
+                } else if (webcamFeed.msRequestFullscreen) { /* IE11 support */
+                    await webcamFeed.msRequestFullscreen();
+                }
+            }
+            
+            // 5. Update the button to indicate the exam has started
+            startExamBtn.innerHTML = '<i class="fas fa-video"></i> EXAM IN PROGRESS';
+            startExamBtn.style.backgroundColor = '#198754';
+            startExamBtn.style.cursor = 'default';
+            startExamBtn.disabled = true;
+            
+        } catch (error) {
+            console.error('Error accessing the webcam or fullscreen: ', error);
+            alert('Could not start the exam. Please ensure you have granted camera permissions.');
+        }
+    });
 }
