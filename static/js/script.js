@@ -299,6 +299,18 @@ if (resumeForm) {
                 startExamLink.style.display = 'block'; // Unhide the button!
                 submitBtn.value = "Uploaded Successfully";
                 submitBtn.style.backgroundColor = "#6c757d"; // Turn gray to show it's done
+                const steps = document.querySelectorAll('.timeline .step');
+                
+                // 1. Mark 'Resume Upload' (Index 1) as completed
+                steps[1].className = 'step completed';
+                steps[1].querySelector('.step-icon').innerHTML = '<i class="fas fa-check"></i>';
+                steps[1].querySelector('.step-subtitle').innerText = '(Green Check)';
+
+                // 2. Mark 'Take Assessment' (Index 2) as active
+                steps[2].className = 'step active';
+                steps[2].querySelector('.step-icon').innerHTML = '<i class="fas fa-laptop-code"></i>';
+                steps[2].querySelector('.step-subtitle').innerText = '(Action Required)';
+                steps[2].querySelector('.step-subtitle').style.color = '';
             } else {
                 alert("Candidate profile does not match required skills. Exam remains locked.");
                 submitBtn.value = "Submit to Server";
