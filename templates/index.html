@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireHub Candidate Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fas fa-wave-square"></i> HireHub
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="far fa-file-alt"></i> Applications</a></li>
+                <li><a href="#"><i class="fas fa-clipboard-list"></i> Assessments</a></li>
+                <li><a href="#"><i class="far fa-user"></i> Profile</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li class="logout-link"><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-bottom">
+            <div class="user-profile-sm">
+                <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=random" alt="User">
+                <span>Alex Johnson</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search assessments...">
+            </div>
+            <div class="header-right">
+                <div class="notification">
+                    <i class="far fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=random" alt="User">
+                    <span>Alex Johnson</span>
+                    <i class="fas fa-chevron-down" style="font-size: 12px; color: #888;"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1>Welcome back, Alex!</h1>
+                <p>You're applying for the Senior Software Engineer role at Tech Solutions Inc.</p>
+            </div>
+
+            <div class="grid-container">
+                <div class="card">
+                    <div class="card">
+
+                        <div id="file-display"
+                            style="display:none; margin-top: 15px; text-align: center; color: #198754; font-weight: 500; font-size: 14px;">
+                        </div>
+                        <span class="upload-hint">Accepted formats: PDF, DOCX | Max size: 5MB</span>
+                    </div>
+                    <div class="timeline">
+                        <div class="step completed">
+                            <div class="step-icon"><i class="fas fa-check"></i></div>
+                            <div class="step-title">Applied</div>
+                            <div class="step-subtitle">(Green Check)</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-icon"><i class="fas fa-upload"></i></div>
+                            <div class="step-title">Resume Upload</div>
+                            <div class="step-subtitle">(Action Required)</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-lock"></i></div>
+                            <div class="step-title">Take Assessment</div>
+                            <div class="step-subtitle" style="color:#888;">(Locked)</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-lock"></i></div>
+                            <div class="step-title">Interview</div>
+                            <div class="step-subtitle" style="color:#888;">(Locked)</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-lock"></i></div>
+                            <div class="step-title">Offer</div>
+                            <div class="step-subtitle" style="color:#888;">(Locked)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Upload Resume</h2>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="upload-area" id="drop-zone">
+                            <div class="upload-icons">
+                                <i class="far fa-file-pdf"></i> + <i class="far fa-file-word"></i>
+                            </div>
+                            <p class="upload-text">Drag & Drop your resume (PDF, DOCX) here,<br>or click to
+                                <strong>browse</strong></p>
+
+                            <input type="file" name="pdf_file" id="file-input" accept=".pdf,.doc,.docx">
+
+                            <button type="button" class="btn-primary" id="upload-btn"
+                                style="margin-bottom: 10px;">Select File</button>
+
+                            <input type="submit" class="btn-primary" id="submit-btn" value="Submit to Server"
+                                style="background-color: #198754;">
+                        </div>
+                    </form>
+
+                    <div id="file-display"
+                        style="display:none; margin-top: 15px; text-align: center; color: #198754; font-weight: 500; font-size: 14px;">
+                    </div>
+                    <span class="upload-hint">Accepted formats: PDF, DOCX | Max size: 5MB</span>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Profile Details</h2>
+                    <div class="profile-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" value="Alex Johnson">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <div class="input-wrapper">
+                                <input type="email" value="alex.johnson@email.com">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <div class="input-wrapper">
+                                <input type="text" value="+1 555-0199">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <div class="input-wrapper">
+                                <input type="text" value="linkedin.com/in/alexj">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn-save">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Assessment Center</h2>
+                    <h3 class="assessment-subtitle">Technical Assessment (Senior Software Engineer)</h3>
+                    <p class="assessment-duration">Duration: 45 Minutes</p>
+
+                    <h4 class="requirements-title">Requirements:</h4>
+                    <ul class="requirements-list">
+                        <li>Webcam</li>
+                        <li>Stable Internet</li>
+                        <li>Microphone</li>
+                    </ul>
+
+                    <button class="btn-start-exam">
+                        <i class="fas fa-play"></i> START EXAM
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
