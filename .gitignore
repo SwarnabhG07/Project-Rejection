@@ -1,0 +1,47 @@
+# Security & API Keys
+.env
+*.env
+env.py
+credentials.json
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+bin/
+lib/
+include/
+
+# AI/Data Persistence
+# FAISS local indices
+*.index
+*.pkl
+
+# ChromaDB/SQLite
+*.db
+*.sqlite3
+
+# Your specific interview results folder
+interview_results/
+uploads/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating System
+.DS_Store
+Thumbs.db
