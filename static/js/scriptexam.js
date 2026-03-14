@@ -1,4 +1,79 @@
 // --- 1. Dynamic Question Loading ---
+
+// ==========================================
+// 0. FULLSCREEN & ANTI-CHEAT LOGIC
+// ==========================================
+const startOverlay = document.getElementById('start-overlay');
+const enterFullscreenBtn = document.getElementById('enter-fullscreen-btn');
+let violationCount = 0;
+const MAX_VIOLATIONS = 3;
+
+// 1. Enter Fullscreen & Dismiss Overlay
+if (enterFullscreenBtn) {
+    enterFullscreenBtn.addEventListener('click', async () => {
+        try {
+            // Trigger browser fullscreen
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                await document.documentElement.webkitRequestFullscreen();
+            }
+            
+            // Hide the overlay to reveal the exam
+            startOverlay.style.display = 'none'; 
+        } catch (err) {
+            alert("Fullscreen access is required to take this exam.");
+        }
+    });
+}
+
+// 2. Monitor Tab Switching
+document.addEventListener("visibilitychange", () => {
+    // Only count violations if the exam has actually started (overlay is gone)
+    if (document.visibilityState === 'hidden' && startOverlay.style.display === 'none') {
+        violationCount++;
+        
+        if (violationCount >= MAX_VIOLATIONS) {
+            terminateExam();
+        } else {
+            alert(`⚠️ WARNING: You left the exam tab!\n\nViolation ${violationCount} of ${MAX_VIOLATIONS}. Your exam will be terminated on the 3rd violation.`);
+        }
+    }
+});
+
+// 3. Terminate Exam Function
+function terminateExam() {
+    // Stop speech recognition if running
+    if (typeof recognition !== 'undefined' && isRecording) {
+        recognition.stop();
+        isRecording = false;
+    }
+    
+    // Shut off the camera
+    const videoElement = document.getElementById('exam-cam');
+    if (videoElement && videoElement.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById('cam-container').style.display = 'none';
+
+    // Force exit fullscreen
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    }
+
+    // Replace the exam UI with a red Termination screen
+    document.getElementById('exam-ui').innerHTML = `
+        <div style="text-align: center; padding: 40px 0;">
+            <i class="fas fa-times-circle" style="font-size: 60px; color: #dc3545; margin-bottom: 20px;"></i>
+            <h2 style="color: #dc3545;">Exam Terminated</h2>
+            <p style="color: #666; margin-top: 10px;">You have exceeded the maximum number of tab-switching violations.</p>
+            <button onclick="window.location.href='/'" class="btn" style="background: #dc3545; color: white; margin: 30px auto 0; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Return to Dashboard</button>
+        </div>
+    `;
+    
+    // Optional: Send a fetch() request to FastAPI here to mark the candidate as "Failed/Cheated" in your database
+}
+
 const questionText = document.getElementById('question-text');
 
 async function loadCurrentQuestion() {
