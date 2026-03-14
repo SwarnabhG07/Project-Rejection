@@ -148,6 +148,36 @@
                         </div>
                     </form>
 
+                    <div class="card">
+                        <h2 class="card-title">Upload Company Document</h2>
+                        <p style="font-size: 14px; color: #555; margin-bottom: 15px;">Attach required company files
+                            (e.g., NDA, Assignment Brief).</p>
+
+                        <form method="POST" enctype="multipart/form-data" action="/upload-company-doc">
+                            <div class="upload-area" id="company-drop-zone">
+                                <div class="upload-icons">
+                                    <i class="far fa-file-pdf"></i> + <i class="far fa-file-word"></i>
+                                </div>
+                                <p class="upload-text">Drag & Drop document here,<br>or click to <strong>browse</strong>
+                                </p>
+
+                                <input type="file" name="company_doc" id="company-file-input" accept=".pdf,.doc,.docx"
+                                    style="display: none;">
+
+                                <button type="button" class="btn-primary" id="company-upload-btn"
+                                    style="margin-bottom: 10px;">Select Document</button>
+
+                                <input type="submit" class="btn-primary" id="company-submit-btn" value="Submit Document"
+                                    style="background-color: #198754; display: none;">
+                            </div>
+                        </form>
+
+                        <div id="company-file-display"
+                            style="display:none; margin-top: 15px; text-align: center; color: #198754; font-weight: 500; font-size: 14px;">
+                        </div>
+                        <span class="upload-hint">Accepted formats: PDF, DOCX | Max size: 5MB</span>
+                    </div>
+
                     <div id="file-display"
                         style="display:none; margin-top: 15px; text-align: center; color: #198754; font-weight: 500; font-size: 14px;">
                     </div>

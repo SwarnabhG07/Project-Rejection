@@ -119,7 +119,80 @@ if (skillsContainer) {
 
 const skillsForm = document.getElementById('skills-form');
 if (skillsForm) {
-    skillsForm.addEventListener('submit', function() {
+    skillsForm.addEventListener('submit', function () {
         hiddenSkillsInput.value = JSON.stringify(skills);
     });
+}
+
+// ==========================================
+// 4. COMPANY DOCUMENT UPLOAD LOGIC
+// ==========================================
+const companyDropZone = document.getElementById('company-drop-zone');
+const companyFileInput = document.getElementById('company-file-input');
+const companyUploadBtn = document.getElementById('company-upload-btn');
+const companyFileDisplay = document.getElementById('company-file-display');
+const companySubmitBtn = document.getElementById('company-submit-btn');
+
+if (companyUploadBtn) {
+    companyUploadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        companyFileInput.click();
+    });
+}
+
+if (companyDropZone) {
+    companyDropZone.addEventListener('click', () => {
+        companyFileInput.click();
+    });
+
+    companyDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        companyDropZone.classList.add('dragover');
+    });
+
+    companyDropZone.addEventListener('dragleave', () => {
+        companyDropZone.classList.remove('dragover');
+    });
+
+    companyDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        companyDropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            companyFileInput.files = e.dataTransfer.files;
+            handleCompanyFile(e.dataTransfer.files[0]);
+        }
+    });
+}
+
+if (companyFileInput) {
+    companyFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleCompanyFile(e.target.files[0]);
+        }
+    });
+}
+
+function handleCompanyFile(file) {
+    const validTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/msword'
+    ];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+        alert('Invalid file type! Please upload a PDF or DOCX file.');
+        return;
+    }
+
+    if (file.size > maxSize) {
+        alert('File is too large! Maximum size is 5MB.');
+        return;
+    }
+
+    companyFileDisplay.innerHTML = `<i class="fas fa-check-circle"></i> Ready to upload: ${file.name}`;
+    companyFileDisplay.style.display = 'block';
+
+    if (companyUploadBtn) companyUploadBtn.style.display = 'none';
+    if (companySubmitBtn) companySubmitBtn.style.display = 'block';
 }
