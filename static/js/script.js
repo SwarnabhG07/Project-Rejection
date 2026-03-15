@@ -1,4 +1,3 @@
-
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadBtn = document.getElementById('upload-btn');
@@ -13,7 +12,8 @@ if (uploadBtn) {
 }
 
 if (dropZone) {
-    dropZone.addEventListener('click', () => {
+    dropZone.addEventListener('click', (e) => {
+        if (e.target.id === 'submit-btn') return;
         fileInput.click();
     });
 
@@ -167,7 +167,9 @@ if (companyUploadBtn) {
 }
 
 if (companyDropZone) {
-    companyDropZone.addEventListener('click', () => {
+    companyDropZone.addEventListener('click', (e) => {
+        if (e.target.id === 'company-submit-btn') return;
+        
         companyFileInput.click();
     });
 
@@ -299,6 +301,7 @@ if (resumeForm) {
                 startExamLink.style.display = 'block'; // Unhide the button!
                 submitBtn.value = "Uploaded Successfully";
                 submitBtn.style.backgroundColor = "#6c757d"; // Turn gray to show it's done
+
                 const steps = document.querySelectorAll('.timeline .step');
                 
                 // 1. Mark 'Resume Upload' (Index 1) as completed
