@@ -72,7 +72,7 @@ async def upload_file(pdf_file: UploadFile = File(...)):
         for page in pdf.pages:
             all_text += page.extract_text() or ""
 
-    resume_skill["document_text"] = all_text
+    resume_skill["resume_text"] = all_text
     
     # Check if skills exist before processing
     if resume_skill.get("req_skill"):
@@ -94,8 +94,17 @@ async def upload_file(pdf_file: UploadFile = File(...)):
 
 @app.post("/save-skills")
 async def save_skills(required_skills: str = Form(...)):
-    resume_skill["req_skill"] = required_skills
-    return {"skills": required_skills}
+    try:
+        parsed_skills_list = json.loads(required_skills)
+        
+        clean_skills_string = ", ".join(parsed_skills_list)
+        
+        resume_skill["req_skill"] = clean_skills_string
+        
+        return {"skills": clean_skills_string}
+    except json.JSONDecodeError:
+        resume_skill["req_skill"] = required_skills
+        return {"skills": required_skills}
 
 @app.get("/api/question")
 async def get_next_question():
