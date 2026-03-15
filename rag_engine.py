@@ -32,18 +32,24 @@ class InterviewRAG:
         return json.loads(clean_text.strip())
 
     def agent_one(self, skills_required, resume_text):
+        print(f"DEBUG: Required Skills: {skills_required}")
+        print(f"DEBUG: Resume Text Length: {len(resume_text)} characters")
+        
         """Identifies the intersection of skills/topics."""
-        sys_prompt = "You are a recruitment architect. Compare the candidate's resume and the company docs."
+        sys_prompt = "You are an expert technical recruiter. Evaluate the candidate's resume against the required technical skills."
         user_prompt = f"""
-        1. Check whether the skills given exist in the resume
-        2. If less than 60% skills match return match : no 
-        3. If more than 60% skills match return match : yes
-        3. Return the overlapping skills.
+        Required Skills: {skills_required}
         
-        Resume: {resume_text}
-        Skills: {skills_required}
+        Resume Text:
+        {resume_text}
         
-        Return exactly as JSON: {{"common_topics": ["skill1", "skill2", "skill3"], "match": "yes"}}
+        Task: 
+        Identify which of the Required Skills are explicitly mentioned in the Resume Text.
+        
+        Return exactly as JSON:
+        {{
+            "common_topics": ["<matched_skill_1>", "<matched_skill_2>"]
+        }}
         """
         
         response = self.gemini.chat.completions.create(
@@ -56,9 +62,18 @@ class InterviewRAG:
         )
 
         result_dict = self._parse_json_safely(response.choices[0].message.content)
-        
-        is_match = result_dict.get("match", "").lower() == "yes"
         self.topics = result_dict.get("common_topics", [])
+        print(f"DEBUG: Extracted Topics from Resume: {self.topics}")
+        
+        required_list = [s.strip().lower() for s in skills_required.split(",")]
+        
+        if not required_list:
+            return False, []
+            
+        match_ratio = len(self.topics) / len(required_list)
+        is_match = match_ratio >= 0.40
+    
+        print(f"DEBUG: Required: {len(required_list)}, Matched: {len(self.topics)}, Ratio: {match_ratio:.2f}")
         
         return is_match, self.topics
 
@@ -77,11 +92,11 @@ class InterviewRAG:
 
     def agent_two(self, elaborate: bool = False):
         if elaborate:
-            sys_msg = "Form a search query to retrieve context for a follow-up interview question based on the candidate's last answer."
-            user_msg = "Return ONLY the query string based on the last topic and answer."
+            sys_msg = "You are an AI generating semantic search queries for a vector database (FAISS). Your goal is to find technical documentation to challenge the candidate's previous answer."
+            user_msg = "Identify the core technical concept or weakness in the candidate's last answer. Return ONLY a concise, keyword-rich search query (max 5-7 words) to retrieve deep technical context about that specific concept. No conversational filler."
         else:
-            sys_msg = "Form a search query to retrieve context for a new interview topic."
-            user_msg = f"Available topics are: {self.topics}. Choose ONE topic not covered in the history, and return ONLY a technical search query for that topic."
+            sys_msg = "You are an AI generating semantic search queries for a vector database (FAISS) to extract interview context."
+            user_msg = f"Available topics: {self.topics}. Select ONE topic not yet discussed in the conversation history. Return ONLY a concise, keyword-rich search query (max 5-7 words) to retrieve advanced engineering documentation on that topic. No conversational filler."
         
         messages = [{"role": "system", "content": sys_msg}]
         messages.extend(self.conversation_history) 
@@ -96,8 +111,18 @@ class InterviewRAG:
 
     def agent_three(self, context: str):
 
-        sys_prompt = "You are a technical interviewer. Frame a challenging, concise question based strictly on the provided context."
-        user_prompt = f"Context: {context}\n\nAsk a challenging question based on this context:"
+        sys_prompt = "You are a Principal Engineer conducting a technical interview. Frame questions that test practical application, architectural trade-offs, or edge cases."
+        user_prompt = f'''Based strictly on the following context, generate ONE concise, challenging interview question. 
+
+        Rules:
+        1. Do NOT ask for a simple definition.
+        2. Pose a scenario, ask about a trade-off, or ask how to handle a specific edge case mentioned in the context.
+        3. Do not include the answer in your question.
+        4. Keep it under 3 sentences.
+
+        Context: {context}
+
+        Question:'''
 
         response = self.gemini.chat.completions.create(
             model=self.model,
@@ -114,17 +139,24 @@ class InterviewRAG:
     def agent_four(self, candidate_answer, context):
         self.conversation_history.append({"role": "user", "content": f"Candidate Answer: {candidate_answer}"})
         """Evaluates the candidate's answer against the context."""
-        sys_prompt = "Evaluate the candidate's answer strictly against the provided company context. Return JSON."
+        sys_prompt = "You are a strict technical evaluator grading an interview answer against official context."
         user_prompt = f"""
+        Evaluate the candidate's answer based STRICTLY on the provided context. Do not use outside knowledge.
+
         Context: {context}
         Candidate Answer: {candidate_answer}
-        
+
+        Scoring Rubric (0 to 10 for each):
+        - relevance: Does the answer address the question asked?
+        - accuracy: Is the technical information factually correct according to the context?
+        - overall_score: The average of relevance and accuracy.
+
         Provide a JSON object exactly in this format:
         {{
-            "overall_score": 0, 
-            "relevance": 0, 
-            "accuracy": 0, 
-            "explanation": "string"
+            "overall_score": <float 0-10>, 
+            "relevance": <int 0-10>, 
+            "accuracy": <int 0-10>, 
+            "explanation": "<1-2 sentences justifying the scores and pointing out missing context>"
         }}
         """
 
