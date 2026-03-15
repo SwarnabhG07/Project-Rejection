@@ -1,4 +1,4 @@
-# InterviewIQ — AI-Powered Enterprise Interview Simulation Platform
+# HireHub — AI-Powered Enterprise Interview Simulation Platform
 
 > Built for **Hack & Forge 2026** — Problem Statement 2: Web-Based Intelligent Selector–Applicant Simulation Platform for Enterprise Recruitment
 
@@ -55,38 +55,26 @@ The system uses a multi-agent AI pipeline grounded in company documents via RAG 
 ### Multi-Agent Pipeline
 
 ```
-Inputs: Interview Guidelines + Company Documents + Candidate Resume
+Inputs: Required Skills + Company Documents + Candidate Resume
             |
         Agent 1 — Topic Extractor
-        Compares resume against company docs via semantic search.
-        Extracts 8–12 relevant topics, scores by relevance,
-        assigns phase (intro / technical / managerial).
+        Compares resume against Required skills.
+        Extracts all relevant topics and checks,
+        whether user is fit for the job
             |
         Agent 2 — Session Orchestrator
-        Controls interview lifecycle and phase progression.
-        Decides follow-up vs next topic based on scores.
+        Chooses what topic to ask question from,
+        and frames a query which is used to get
+        context from a RAG architecture for framing question.
             |
         Agent 3 — Question Framer
-        Retrieves top-k document chunks via RAG.
-        Frames specific, document-grounded questions.
+        Based on the context, generates questions
+        which the user has to answer.
             |
-        Candidate answers (speech-to-text)
-            |
-        Agent 4 — Evaluator
-        Scores answer against retrieved chunks on 4 dimensions.
-        Writes to session scores file.
-            |
-        Agent 5 — Remediation Advisor
-        Monitors scores. Flags weak topics back to Agent 1.
-            |
-        Agent 6 — Report Generator
-        Aggregates scores. Generates Hire / Hold / Reject report.
+        Agent 4 - Evaluator
+        Scores answer against retrieved context on more dimensions.
+        Writes to session scores and reason for the score into a file.
 ```
-
-### Shared Session State
-
-All agents communicate through a shared Redis session state object — no direct inter-agent context passing. This makes each agent independently scalable.
-
 ### RAG Pipeline
 
 ```
@@ -96,7 +84,7 @@ Company Documents
       |
   Embedding Model (sentence-transformers)
       |
-  Vector Store (FAISS → Pinecone in production)
+  Vector Store (FAISS)
       |
   Query at inference time → Top-k chunks retrieved
       |
@@ -113,13 +101,10 @@ Company Documents
 | Backend API | FastAPI, Python |
 | Authentication | FastAPI sessions |
 | PDF Processing | pdfplumber |
-| AI / LLM | OpenAI / Claude API via LangChain |
-| NLP Evaluation | sentence-transformers, spaCy |
-| Vector Store | FAISS (prototype), Pinecone (production) |
-| Agent Orchestration | LangChain / LangGraph |
-| Session State | Redis |
-| Database | SQLite (prototype), PostgreSQL (production) |
-| Deployment | Uvicorn, Docker |
+| AI / LLM | Gemini API via Chat Completions |
+| NLP Evaluation | sentence-transformers |
+| Vector Store | FAISS |
+| Session State | Python dictionary (single user demo) |
 
 ---
 
@@ -176,6 +161,7 @@ pip install -r requirements.txt
 ```bash
 uvicorn main:app --reload
 ```
+wait for few seconds...
 
 ### Open in browser
 
